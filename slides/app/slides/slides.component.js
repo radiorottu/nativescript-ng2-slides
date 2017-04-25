@@ -339,7 +339,6 @@ var SlidesComponent = (function () {
         });
     };
     SlidesComponent.prototype.goToSlide = function (index) {
-        console.log("goToSlide");
         if (this._slideMap && this._slideMap.length > 0 && index < this._slideMap.length) {
             this.setupPanel(this._slideMap[index]);
             if (index > 0)

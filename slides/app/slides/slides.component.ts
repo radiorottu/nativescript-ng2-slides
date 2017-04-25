@@ -424,7 +424,6 @@ export class SlidesComponent implements OnInit, AfterViewInit {
 	}
 
 	public goToSlide(index: number): void {
-		console.log("goToSlide");
 		if (this._slideMap && this._slideMap.length > 0 && index < this._slideMap.length) {
 			this.setupPanel(this._slideMap[index]);
 
