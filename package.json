@@ -10,13 +10,13 @@
   },
   "scripts": {
     "build": "tsc",
-    "demo.ios": "npm run preparedemo && cd demo && tns emulate ios",
     "demo.android": "npm run preparedemo && cd demo && tns run android",
-    "preparedemo": "npm run build && cd demo && tns plugin remove nativescript-ng2-slides && tns plugin add .. && tns install",
-    "setup": "npm install && cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd ..",
-    "livesync.ios": "cd slides  && tns livesync ios --watch",
+    "demo.ios": "npm run preparedemo && cd demo && tns emulate ios",
+    "ios": "xcproj --project platforms/ios/YourApp.xcodeproj touch; xcproj --project platforms/ios/Pods/Pods.xcodeproj touch; tns livesync ios --emulator --watch",
     "livesync.android": "cd slides  && tns livesync android --watch",
-    "ios": "xcproj --project platforms/ios/YourApp.xcodeproj touch; xcproj --project platforms/ios/Pods/Pods.xcodeproj touch; tns livesync ios --emulator --watch"
+    "livesync.ios": "cd slides  && tns livesync ios --watch",
+    "preparedemo": "npm run build && cd demo && tns plugin remove nativescript-ng2-slides && tns plugin add .. && tns install",
+    "setup": "npm install && cd demo && npm install && cd .. && npm run build && cd demo && tns plugin add .. && cd .."
   },
   "dependencies": {
     "@angular/common": "2.2.1",
@@ -41,7 +41,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/TheOriginalJosh/nativescript-ng2-slides"
+    "url": "git+https://github.com/radiorottu/nativescript-ng2-slides.git"
   },
   "author": "Josh Sommer <joshdsommer@gmail.com> (https://twitter.com/_JoshSommer)",
   "license": "MIT"

@@ -57,7 +57,7 @@ enum cancellationReason {
 	encapsulation: ViewEncapsulation.None
 })
 
-export class SlidesComponent implements OnInit {
+export class SlidesComponent implements OnInit, AfterViewInit {
 	@ContentChildren(forwardRef(() => SlideComponent)) slides: QueryList<SlideComponent>;
 	@ViewChild('footer') footer: ElementRef;
 	@Input('pageWidth') pageWidth: number;
@@ -78,6 +78,9 @@ export class SlidesComponent implements OnInit {
 	get hasPrevious(): boolean {
 		return !!this.currentSlide && !!this.currentSlide.left;
 	}
+	get currentIndex(): number {
+		return (this.currentSlide) ? this.currentSlide.index : 0;
+	}
 
 	constructor(private ref: ChangeDetectorRef) {
 		this.indicators = [];
@@ -91,27 +94,36 @@ export class SlidesComponent implements OnInit {
 	}
 
 	ngAfterViewInit() {
-		// loop through slides and setup height and widith
-		this.slides.forEach((slide: SlideComponent) => {
-			AbsoluteLayout.setLeft(slide.layout, this.pageWidth);
-			slide.slideWidth = this.pageWidth;
-			slide.slideHeight = this.pageHeight;
+		if (this.slides.length > 0)
+			this.initSlides();
+		this.slides.changes.subscribe(d => {
+			this.initSlides();
 		});
-
-		this.currentSlide = this.buildSlideMap(this.slides.toArray());
-
-		if (this.pageIndicators) {
-			this.buildFooter(this.slides.length);
-			this.setActivePageIndicator(0);
-		}
-		if (this.currentSlide) {
-			this.positionSlides(this.currentSlide);
-			this.applySwipe(this.pageWidth);
-		}
 	}
 
 	ngOnDestroy() {
+	}
 
+	initSlides() {
+		if (this.slides.length > 0) {
+			// loop through slides and setup height and width
+			this.slides.forEach((slide: SlideComponent) => {
+				AbsoluteLayout.setLeft(slide.layout, this.pageWidth);
+				slide.slideWidth = this.pageWidth;
+				slide.slideHeight = this.pageHeight;
+			});
+
+			this.currentSlide = this.buildSlideMap(this.slides.toArray());
+
+			if (this.pageIndicators) {
+				this.buildFooter(this.slides.length);
+				this.setActivePageIndicator(0);
+			}
+			if (this.currentSlide) {
+				this.positionSlides(this.currentSlide);
+				this.applySwipe(this.pageWidth);
+			}
+		}
 	}
 
 	//footer stuff
@@ -124,13 +136,10 @@ export class SlidesComponent implements OnInit {
 		footerSection.horizontalAlignment = 'center';
 
 		if (app.ios) {
-<<<<<<< HEAD
 			footerSection.clipToBounds = false;
-=======
-		    footerSection.clipToBounds = false;
-		} else if (app.android) {
+		}
+		else if (app.android) {
 			footerSection.android.getParent().setClipChildren(false);
->>>>>>> origin/master
 		}
 
 		footerSection.orientation = 'horizontal';
@@ -232,127 +241,134 @@ export class SlidesComponent implements OnInit {
 
 	}
 
+	public handlePan(args: gestures.PanGestureEventData): void {
+		var pageWidth = this.pageWidth;
+		let previousDelta = -1; //hack to get around ios firing pan event after release
+		let endingVelocity = 0;
+		let startTime, deltaTime;
+
+		if (args.state === gestures.GestureStateTypes.began) {
+			startTime = Date.now();
+			previousDelta = 0;
+			endingVelocity = 250;
+
+			//this.triggerStartEvent();
+		} else if (args.state === gestures.GestureStateTypes.ended) {
+			deltaTime = Date.now() - startTime;
+			// if velocityScrolling is enabled then calculate the velocitty
+
+			// swiping left to right.
+			if (args.deltaX > (pageWidth / 3)) {
+				if (this.hasPrevious) {
+					this.transitioning = true;
+					this.showLeftSlide(this.currentSlide, args.deltaX, endingVelocity).then(() => {
+						this.setupPanel(this.currentSlide.left);
+
+						//this.triggerChangeEventLeftToRight();
+					});
+				} else {
+					//We're at the start
+					//Notify no more slides
+					//this.triggerCancelEvent(cancellationReason.noPrevSlides);
+				}
+				return;
+			}
+			// swiping right to left
+			else if (args.deltaX < (-pageWidth / 3)) {
+				if (this.hasNext) {
+					this.transitioning = true;
+					this.showRightSlide(this.currentSlide, args.deltaX, endingVelocity).then(() => {
+						this.setupPanel(this.currentSlide.right);
+
+						// Notify changed
+						//this.triggerChangeEventRightToLeft();
+
+						if (!this.hasNext) {
+							// Notify finsihed
+							// this.notify({
+							// 	eventName: SlideContainer.FINISHED_EVENT,
+							// 	object: this
+							// });
+						}
+					});
+				} else {
+					// We're at the end
+					// Notify no more slides
+					//this.triggerCancelEvent(cancellationReason.noMoreSlides);
+				}
+				return;
+			}
+
+			if (this.transitioning === false) {
+				//Notify cancelled
+				//this.triggerCancelEvent(cancellationReason.user);
+				this.transitioning = true;
+				this.currentSlide.slide.layout.animate({
+					translate: { x: -this.pageWidth, y: 0 },
+					duration: 200,
+					curve: AnimationCurve.easeOut
+				});
+				if (this.hasNext) {
+					this.currentSlide.right.slide.layout.animate({
+						translate: { x: 0, y: 0 },
+						duration: 200,
+						curve: AnimationCurve.easeOut
+					});
+					if (app.ios) //for some reason i have to set these in ios or there is some sort of bounce back.
+						this.currentSlide.right.slide.layout.translateX = 0;
+				}
+				if (this.hasPrevious) {
+					this.currentSlide.left.slide.layout.animate({
+						translate: { x: -this.pageWidth * 2, y: 0 },
+						duration: 200,
+						curve: AnimationCurve.easeOut
+					});
+					if (app.ios)
+						this.currentSlide.left.slide.layout.translateX = -this.pageWidth;
+
+				}
+				if (app.ios)
+					this.currentSlide.slide.layout.translateX = -this.pageWidth;
+
+				this.transitioning = false;
+			}
+		} else {
+			if (!this.transitioning
+				&& previousDelta !== args.deltaX
+				&& args.deltaX != null
+				&& args.deltaX < 0) {
+
+				if (this.hasNext) {
+					this.direction = direction.left;
+					this.currentSlide.slide.layout.translateX = args.deltaX - this.pageWidth;
+					this.currentSlide.right.slide.layout.translateX = args.deltaX;
+
+				}
+			} else if (!this.transitioning
+				&& previousDelta !== args.deltaX
+				&& args.deltaX != null
+				&& args.deltaX > 0) {
+
+				if (this.hasPrevious) {
+					this.direction = direction.right;
+					this.currentSlide.slide.layout.translateX = args.deltaX - this.pageWidth;
+					this.currentSlide.left.slide.layout.translateX = -(this.pageWidth * 2) + args.deltaX;
+				}
+			}
+
+			if (args.deltaX !== 0) {
+				previousDelta = args.deltaX;
+			}
+
+		}
+	}
+
 	public applySwipe(pageWidth: number): void {
 		let previousDelta = -1; //hack to get around ios firing pan event after release
 		let endingVelocity = 0;
 		let startTime, deltaTime;
 
-		this.currentSlide.slide.layout.on('pan', (args: gestures.PanGestureEventData): void => {
-			if (args.state === gestures.GestureStateTypes.began) {
-				startTime = Date.now();
-				previousDelta = 0;
-				endingVelocity = 250;
-
-				//this.triggerStartEvent();
-			} else if (args.state === gestures.GestureStateTypes.ended) {
-				deltaTime = Date.now() - startTime;
-				// if velocityScrolling is enabled then calculate the velocitty
-
-				// swiping left to right.
-				if (args.deltaX > (pageWidth / 3)) {
-					if (this.hasPrevious) {
-						this.transitioning = true;
-						this.showLeftSlide(this.currentSlide, args.deltaX, endingVelocity).then(() => {
-							this.setupPanel(this.currentSlide.left);
-
-							//this.triggerChangeEventLeftToRight();
-						});
-					} else {
-						//We're at the start
-						//Notify no more slides
-						//this.triggerCancelEvent(cancellationReason.noPrevSlides);
-					}
-					return;
-				}
-				// swiping right to left
-				else if (args.deltaX < (-pageWidth / 3)) {
-					if (this.hasNext) {
-						this.transitioning = true;
-						this.showRightSlide(this.currentSlide, args.deltaX, endingVelocity).then(() => {
-							this.setupPanel(this.currentSlide.right);
-
-							// Notify changed
-							//this.triggerChangeEventRightToLeft();
-
-							if (!this.hasNext) {
-								// Notify finsihed
-								// this.notify({
-								// 	eventName: SlideContainer.FINISHED_EVENT,
-								// 	object: this
-								// });
-							}
-						});
-					} else {
-						// We're at the end
-						// Notify no more slides
-						//this.triggerCancelEvent(cancellationReason.noMoreSlides);
-					}
-					return;
-				}
-
-				if (this.transitioning === false) {
-					//Notify cancelled
-					//this.triggerCancelEvent(cancellationReason.user);
-					this.transitioning = true;
-					this.currentSlide.slide.layout.animate({
-						translate: { x: -this.pageWidth, y: 0 },
-						duration: 200,
-						curve: AnimationCurve.easeOut
-					});
-					if (this.hasNext) {
-						this.currentSlide.right.slide.layout.animate({
-							translate: { x: 0, y: 0 },
-							duration: 200,
-							curve: AnimationCurve.easeOut
-						});
-						if (app.ios) //for some reason i have to set these in ios or there is some sort of bounce back.
-							this.currentSlide.right.slide.layout.translateX = 0;
-					}
-					if (this.hasPrevious) {
-						this.currentSlide.left.slide.layout.animate({
-							translate: { x: -this.pageWidth * 2, y: 0 },
-							duration: 200,
-							curve: AnimationCurve.easeOut
-						});
-						if (app.ios)
-							this.currentSlide.left.slide.layout.translateX = -this.pageWidth;
-
-					}
-					if (app.ios)
-						this.currentSlide.slide.layout.translateX = -this.pageWidth;
-
-					this.transitioning = false;
-				}
-			} else {
-				if (!this.transitioning
-					&& previousDelta !== args.deltaX
-					&& args.deltaX != null
-					&& args.deltaX < 0) {
-
-					if (this.hasNext) {
-						this.direction = direction.left;
-						this.currentSlide.slide.layout.translateX = args.deltaX - this.pageWidth;
-						this.currentSlide.right.slide.layout.translateX = args.deltaX;
-
-					}
-				} else if (!this.transitioning
-					&& previousDelta !== args.deltaX
-					&& args.deltaX != null
-					&& args.deltaX > 0) {
-
-					if (this.hasPrevious) {
-						this.direction = direction.right;
-						this.currentSlide.slide.layout.translateX = args.deltaX - this.pageWidth;
-						this.currentSlide.left.slide.layout.translateX = -(this.pageWidth * 2) + args.deltaX;
-					}
-				}
-
-				if (args.deltaX !== 0) {
-					previousDelta = args.deltaX;
-				}
-
-			}
-		});
+		this.currentSlide.slide.layout.on('pan', (args: gestures.PanGestureEventData) => this.handlePan(args));
 	}
 
 	private buildSlideMap(slides: SlideComponent[]) {
@@ -405,5 +421,15 @@ export class SlidesComponent implements OnInit {
 
 			//this.triggerChangeEventLeftToRight();
 		});
+	}
+
+	public goToSlide(index: number): void {
+		console.log("goToSlide");
+		if (this._slideMap && this._slideMap.length > 0 && index < this._slideMap.length) {
+			this.setupPanel(this._slideMap[index]);
+
+			if (index > 0)
+				this._slideMap[0].slide.layout.translateX = -this.pageWidth * 2;
+		}
 	}
 }

@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { StackLayout } from 'ui/layouts/stack-layout';
 import * as gestures from 'ui/gestures';
 
-
 @Component({
 	selector: 'slide',
 	template: `
@@ -33,8 +32,6 @@ export class SlideComponent implements OnInit {
 		this.cssClass = this.cssClass ? this.cssClass : '';
 	}
 
-	ngOnInit() { }
-
-	ngAfterViewIn
-
+	ngOnInit() {
+	}
 }
