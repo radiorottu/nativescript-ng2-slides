@@ -340,6 +340,9 @@ var SlidesComponent = (function () {
     };
     SlidesComponent.prototype.goToSlide = function (index) {
         if (this._slideMap && this._slideMap.length > 0 && index < this._slideMap.length) {
+            console.log("goToSlide ", index);
+            console.log("oldIndex ", this.currentSlide.index);
+            this._slideMap[this.currentSlide.index].slide.layout.translateX = -this.pageWidth * 2;
             this.setupPanel(this._slideMap[index]);
             if (index > 0)
                 this._slideMap[0].slide.layout.translateX = -this.pageWidth * 2;

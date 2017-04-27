@@ -425,6 +425,9 @@ export class SlidesComponent implements OnInit, AfterViewInit {
 
 	public goToSlide(index: number): void {
 		if (this._slideMap && this._slideMap.length > 0 && index < this._slideMap.length) {
+			
+			this._slideMap[this.currentSlide.index].slide.layout.translateX = -this.pageWidth * 2;
+
 			this.setupPanel(this._slideMap[index]);
 
 			if (index > 0)
