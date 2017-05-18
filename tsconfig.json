@@ -5,9 +5,8 @@
         "sourceMap": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "noEmitHelpers": false,
-        "noEmitOnError": false,
-        "noEmit": false,
+        "noEmitHelpers": true,
+        "noEmitOnError": true,
         "allowUnreachableCode": true,
         "skipLibCheck": true
     },
