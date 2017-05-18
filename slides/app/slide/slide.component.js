@@ -8,7 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = require("@angular/core");
 var SlideComponent = (function () {
     function SlideComponent() {
         this.cssClass = this.cssClass ? this.cssClass : '';
@@ -36,22 +37,23 @@ var SlideComponent = (function () {
     });
     SlideComponent.prototype.ngOnInit = function () {
     };
-    __decorate([
-        core_1.ViewChild('slideLayout'), 
-        __metadata('design:type', core_1.ElementRef)
-    ], SlideComponent.prototype, "slideLayout", void 0);
-    __decorate([
-        core_1.Input('class'), 
-        __metadata('design:type', String)
-    ], SlideComponent.prototype, "cssClass", void 0);
-    SlideComponent = __decorate([
-        core_1.Component({
-            selector: 'slide',
-            template: "\n\t<StackLayout #slideLayout [class]=\"cssClass\">\n\t\t<ng-content></ng-content>\n\t</StackLayout>\n\t",
-        }), 
-        __metadata('design:paramtypes', [])
-    ], SlideComponent);
     return SlideComponent;
 }());
+__decorate([
+    core_1.ViewChild('slideLayout'),
+    __metadata("design:type", typeof (_a = typeof core_1.ElementRef !== "undefined" && core_1.ElementRef) === "function" && _a || Object)
+], SlideComponent.prototype, "slideLayout", void 0);
+__decorate([
+    core_1.Input('class'),
+    __metadata("design:type", String)
+], SlideComponent.prototype, "cssClass", void 0);
+SlideComponent = __decorate([
+    core_1.Component({
+        selector: 'slide',
+        template: "\n\t<StackLayout #slideLayout [class]=\"cssClass\">\n\t\t<ng-content></ng-content>\n\t</StackLayout>\n\t",
+    }),
+    __metadata("design:paramtypes", [])
+], SlideComponent);
 exports.SlideComponent = SlideComponent;
+var _a;
 //# sourceMappingURL=slide.component.js.map

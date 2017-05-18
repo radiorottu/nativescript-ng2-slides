@@ -8,14 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
-var slide_component_1 = require('../slide/slide.component');
-var gestures = require('ui/gestures');
-var platform = require('platform');
-var AnimationModule = require('ui/animation');
-var enums_1 = require('ui/enums');
-var app = require('application');
-var absolute_layout_1 = require('ui/layouts/absolute-layout');
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = require("@angular/core");
+var slide_component_1 = require("../slide/slide.component");
+var gestures = require("ui/gestures");
+var platform = require("platform");
+var AnimationModule = require("ui/animation");
+var enums_1 = require("ui/enums");
+var app = require("application");
+var absolute_layout_1 = require("ui/layouts/absolute-layout");
 var direction;
 (function (direction) {
     direction[direction["none"] = 0] = "none";
@@ -201,6 +202,7 @@ var SlidesComponent = (function () {
             startTime = Date.now();
             previousDelta = 0;
             endingVelocity = 250;
+            //this.triggerStartEvent();
         }
         else if (args.state === gestures.GestureStateTypes.ended) {
             deltaTime = Date.now() - startTime;
@@ -215,6 +217,9 @@ var SlidesComponent = (function () {
                     });
                 }
                 else {
+                    //We're at the start
+                    //Notify no more slides
+                    //this.triggerCancelEvent(cancellationReason.noPrevSlides);
                 }
                 return;
             }
@@ -226,10 +231,18 @@ var SlidesComponent = (function () {
                         // Notify changed
                         //this.triggerChangeEventRightToLeft();
                         if (!_this.hasNext) {
+                            // Notify finsihed
+                            // this.notify({
+                            // 	eventName: SlideContainer.FINISHED_EVENT,
+                            // 	object: this
+                            // });
                         }
                     });
                 }
                 else {
+                    // We're at the end
+                    // Notify no more slides
+                    //this.triggerCancelEvent(cancellationReason.noMoreSlides);
                 }
                 return;
             }
@@ -355,40 +368,41 @@ var SlidesComponent = (function () {
                 this._slideMap[0].slide.layout.translateX = -this.pageWidth * 2;
         }
     };
-    __decorate([
-        core_1.ContentChildren(core_1.forwardRef(function () { return slide_component_1.SlideComponent; })), 
-        __metadata('design:type', core_1.QueryList)
-    ], SlidesComponent.prototype, "slides", void 0);
-    __decorate([
-        core_1.ViewChild('footer'), 
-        __metadata('design:type', core_1.ElementRef)
-    ], SlidesComponent.prototype, "footer", void 0);
-    __decorate([
-        core_1.Input('pageWidth'), 
-        __metadata('design:type', Number)
-    ], SlidesComponent.prototype, "pageWidth", void 0);
-    __decorate([
-        core_1.Input('pageHeight'), 
-        __metadata('design:type', Number)
-    ], SlidesComponent.prototype, "pageHeight", void 0);
-    __decorate([
-        core_1.Input('loop'), 
-        __metadata('design:type', Boolean)
-    ], SlidesComponent.prototype, "loop", void 0);
-    __decorate([
-        core_1.Input('pageIndicators'), 
-        __metadata('design:type', Boolean)
-    ], SlidesComponent.prototype, "pageIndicators", void 0);
-    SlidesComponent = __decorate([
-        core_1.Component({
-            selector: 'slides',
-            template: "\n\t<AbsoluteLayout>\n\t\t<ng-content></ng-content>\n\t\t<StackLayout *ngIf=\"pageIndicators\" #footer orientation=\"horizontal\" class=\"footer\">\n\t\t\t<Label *ngFor=\"let indicator of indicators\"\n\t\t\t\t[class.slide-indicator-active]=\"indicator.active == true\"\n\t\t\t\t[class.slide-indicator-inactive]=\"indicator.active == false\t\"\n\t\t\t></Label>\n\n\t\t</StackLayout>\n\t</AbsoluteLayout>\n\t",
-            styles: ["\n\t\t.footer{\n\t\t\twidth:100%;\n\t\t\theight:20%\n\t\t\thorizontal-align:center;\n\t\t}\n\t"],
-            encapsulation: core_1.ViewEncapsulation.None
-        }), 
-        __metadata('design:paramtypes', [core_1.ChangeDetectorRef])
-    ], SlidesComponent);
     return SlidesComponent;
 }());
+__decorate([
+    core_1.ContentChildren(core_1.forwardRef(function () { return slide_component_1.SlideComponent; })),
+    __metadata("design:type", typeof (_a = typeof core_1.QueryList !== "undefined" && core_1.QueryList) === "function" && _a || Object)
+], SlidesComponent.prototype, "slides", void 0);
+__decorate([
+    core_1.ViewChild('footer'),
+    __metadata("design:type", typeof (_b = typeof core_1.ElementRef !== "undefined" && core_1.ElementRef) === "function" && _b || Object)
+], SlidesComponent.prototype, "footer", void 0);
+__decorate([
+    core_1.Input('pageWidth'),
+    __metadata("design:type", Number)
+], SlidesComponent.prototype, "pageWidth", void 0);
+__decorate([
+    core_1.Input('pageHeight'),
+    __metadata("design:type", Number)
+], SlidesComponent.prototype, "pageHeight", void 0);
+__decorate([
+    core_1.Input('loop'),
+    __metadata("design:type", Boolean)
+], SlidesComponent.prototype, "loop", void 0);
+__decorate([
+    core_1.Input('pageIndicators'),
+    __metadata("design:type", Boolean)
+], SlidesComponent.prototype, "pageIndicators", void 0);
+SlidesComponent = __decorate([
+    core_1.Component({
+        selector: 'slides',
+        template: "\n\t<AbsoluteLayout>\n\t\t<ng-content></ng-content>\n\t\t<StackLayout *ngIf=\"pageIndicators\" #footer orientation=\"horizontal\" class=\"footer\">\n\t\t\t<Label *ngFor=\"let indicator of indicators\"\n\t\t\t\t[class.slide-indicator-active]=\"indicator.active == true\"\n\t\t\t\t[class.slide-indicator-inactive]=\"indicator.active == false\t\"\n\t\t\t></Label>\n\n\t\t</StackLayout>\n\t</AbsoluteLayout>\n\t",
+        styles: ["\n\t\t.footer{\n\t\t\twidth:100%;\n\t\t\theight:20%\n\t\t\thorizontal-align:center;\n\t\t}\n\t"],
+        encapsulation: core_1.ViewEncapsulation.None
+    }),
+    __metadata("design:paramtypes", [typeof (_c = typeof core_1.ChangeDetectorRef !== "undefined" && core_1.ChangeDetectorRef) === "function" && _c || Object])
+], SlidesComponent);
 exports.SlidesComponent = SlidesComponent;
+var _a, _b, _c;
 //# sourceMappingURL=slides.component.js.map
